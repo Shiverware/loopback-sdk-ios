@@ -145,6 +145,16 @@ NSArray * SLAFQueryStringPairsFromDictionary(NSDictionary *dictionary) {
 NSArray * SLAFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     NSMutableArray *mutableQueryStringComponents = [NSMutableArray array];
 
+    //If the key is a filter, use stringified json
+    if ([key  isEqual: @"filter"]) {
+      NSError *error;
+      NSData *jsonData = [NSJSONSerialization dataWithJSONObject:value
+                                                         options:0
+                                                           error:&error];
+      NSString* aStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+      value = aStr;
+    }
+  
     if ([value isKindOfClass:[NSDictionary class]]) {
         NSDictionary *dictionary = value;
         // Sort dictionary keys to ensure consistent ordering in query string, which is important when deserializing potentially ambiguous sequences, such as an array of dictionaries
