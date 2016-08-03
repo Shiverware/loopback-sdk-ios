@@ -136,7 +136,8 @@
                 [model setValue:obj forKey:key];
             }
             @catch (NSException *e) {
-                // ignore any failure
+              // ignore and log any failure
+              NSLog(@"Could not set value on model for key:%@ error:%@", key, e);
             }
         }
         free(props);
