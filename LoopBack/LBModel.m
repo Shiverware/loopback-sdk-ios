@@ -130,8 +130,10 @@
                 else if (strncmp(type, "T@\"CLLocation\",", 15) == 0) {
                     obj = [SLObject locationFromEncodedProperty:obj];
                 }
+            } else if ([obj isKindOfClass:[NSNull class]]) { // Handle the case where NULL is explicitly set for an NSObject to make it nil
+              obj = nil;
             }
-
+          
             @try {
                 [model setValue:obj forKey:key];
             }
