@@ -53,7 +53,13 @@
         for (int i = 0; i < propertyCount; i++) {
             NSString *propertyName = [NSString stringWithCString:property_getName(properties[i])
                                                         encoding:NSUTF8StringEncoding];
+          
+            // Setting a model parameter to nil should set it to null on the server
             id obj = [self valueForKey:propertyName];
+            if (obj == nil) {
+              obj = [NSNull null];
+            }
+          
             [dict setValue:obj forKey:propertyName];
         }
         free(properties);
