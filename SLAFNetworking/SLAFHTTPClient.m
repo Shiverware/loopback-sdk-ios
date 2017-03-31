@@ -575,6 +575,8 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 #pragma mark -
 
 - (void)enqueueHTTPRequestOperation:(SLAFHTTPRequestOperation *)operation {
+    operation.successCallbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+    operation.failureCallbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
     [self.operationQueue addOperation:operation];
 }
 
@@ -634,6 +636,8 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
         __weak __typeof(&*operation)weakOperation = operation;
         operation.completionBlock = ^{
             __strong __typeof(&*weakOperation)strongOperation = weakOperation;
+          strongOperation.successCallbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+          strongOperation.failureCallbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu"
             dispatch_queue_t queue = strongOperation.successCallbackQueue ?: dispatch_get_main_queue();
