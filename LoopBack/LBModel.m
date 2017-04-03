@@ -8,7 +8,7 @@
 #import <objc/runtime.h>
 
 #import "LBModel.h"
-
+#import "LBRESTAdapter.h"
 
 @interface LBModel() {
     NSMutableDictionary *__overflow;
