@@ -135,6 +135,31 @@
                 // if the property type is CLLocation, convert the json object to a location object
                 else if (strncmp(type, "T@\"CLLocation\",", 15) == 0) {
                     obj = [SLObject locationFromEncodedProperty:obj];
+                } else {
+                  // Attempt to create child model objects if included in the json
+                  NSString * typeString = [NSString stringWithUTF8String:type];
+                  NSArray * attributes = [typeString componentsSeparatedByString:@","];
+                  NSString * typeAttribute = [attributes objectAtIndex:0];
+                  if (typeAttribute != nil && [typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 7) {
+                    NSString * typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length]-4)];  //turns @"NSDate" into NSDate
+                    Class typeClass = NSClassFromString(typeClassName);
+                    if (typeClass != nil && [typeClass isSubclassOfClass:[LBModel class]]) {
+                      NSString * repoClassName = [NSStringFromClass(typeClass) stringByAppendingString:@"Repository"];
+                      Class repoClass = NSClassFromString(repoClassName);
+                      if (repoClass != nil && [repoClass isSubclassOfClass:[LBModelRepository class]]) {
+                        if ([self.adapter isKindOfClass:[LBRESTAdapter class]]) {
+                          LBRESTAdapter * restAdaptor = (LBRESTAdapter *) self.adapter;
+                          LBModelRepository * repWithAdaptor = [restAdaptor repositoryWithClass:repoClass];
+                          LBModel * internalModel = [repWithAdaptor modelWithDictionary:obj];
+                          obj = internalModel;
+                        } else {
+                          LBModelRepository * rClass = (LBModelRepository *) [[repoClass alloc] init];
+                          LBModel * internalModel = [rClass modelWithDictionary:obj];
+                          obj = internalModel;
+                        }
+                      }
+                    }
+                  }
                 }
             } else if ([obj isKindOfClass:[NSNull class]]) { // Handle the case where NULL is explicitly set for an NSObject to make it nil
               obj = nil;
