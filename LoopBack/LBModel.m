@@ -51,16 +51,23 @@
         objc_property_t *properties = class_copyPropertyList(targetClass, &propertyCount);
 
         for (int i = 0; i < propertyCount; i++) {
-            NSString *propertyName = [NSString stringWithCString:property_getName(properties[i])
-                                                        encoding:NSUTF8StringEncoding];
+          NSString *propertyName = [NSString stringWithCString:property_getName(properties[i])
+                                                      encoding:NSUTF8StringEncoding];
           
-            // Setting a model parameter to nil should set it to null on the server
-            id obj = [self valueForKey:propertyName];
-            if (obj == nil) {
-              obj = [NSNull null];
-            }
+          // Do not send model getter 'id' fields as creation parameters
+          if([propertyName isEqualToString:@"id"]) {
+            continue;
+          }
           
-            [dict setValue:obj forKey:propertyName];
+          // Setting a model parameter to nil should set it to null on the server
+          id obj = [self valueForKey:propertyName];
+          
+          // Do not overwrite default parameters set by the server by sending an explicit null; createdAt and updatedAt should never be set and always maintained by the server
+          if (obj == nil && ![propertyName isEqualToString:@"createdAt"] && ![propertyName isEqualToString:@"updatedAt"]) {
+            obj = [NSNull null];
+          }
+          
+          [dict setValue:obj forKey:propertyName];
         }
         free(properties);
     }
