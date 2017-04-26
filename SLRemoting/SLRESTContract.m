@@ -126,8 +126,10 @@ NSString *SLRESTContractDefaultVerb = @"POST";
 
 - (void)addItemsFromContract:(SLRESTContract *)contract {
     NSParameterAssert(contract);
-
-    [(NSMutableDictionary *)self.dict addEntriesFromDictionary:contract.dict];
+    
+    NSMutableDictionary * newDictionary = [self.dict mutableCopy];
+    [newDictionary addEntriesFromDictionary:contract.dict];
+    self.dict = newDictionary;
 }
 
 - (NSString *)urlForMethod:(NSString *)method
