@@ -59,11 +59,11 @@
             continue;
           }
           
-          // Setting a model parameter to nil should set it to null on the server
           id obj = [self valueForKey:propertyName];
           
+          // Setting a model parameter to nil should set it to null on the server EXCEPT for read-only properties date and GPS pointLocation
           // Do not overwrite default parameters set by the server by sending an explicit null; createdAt and updatedAt should never be set and always maintained by the server
-          if (obj == nil && ![propertyName isEqualToString:@"createdAt"] && ![propertyName isEqualToString:@"updatedAt"]) {
+          if (obj == nil && ![propertyName isEqualToString:@"createdAt"] && ![propertyName isEqualToString:@"updatedAt"] && ![propertyName isEqualToString:@"pointLocation"]) {
             obj = [NSNull null];
           }
           
