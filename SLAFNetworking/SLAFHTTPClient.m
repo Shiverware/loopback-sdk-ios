@@ -146,7 +146,7 @@ NSArray * SLAFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     NSMutableArray *mutableQueryStringComponents = [NSMutableArray array];
 
     //If the key is a filter, use stringified json
-    if ([key isEqual: @"filter"] || [key isEqual: @"customFilter"]) {
+    if ([key isEqual: @"filter"] || [key isEqual: @"withFilter"]) {
       NSError *error;
       NSData *jsonData = [NSJSONSerialization dataWithJSONObject:value
                                                          options:0
