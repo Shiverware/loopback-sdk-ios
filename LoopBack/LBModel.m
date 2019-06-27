@@ -121,7 +121,19 @@
         for (int i = 0; i < count; i++) {
             objc_property_t property = props[i];
             const char *name = property_getName(property);
-            NSString *key = [NSString stringWithUTF8String:name];
+          
+            NSMutableString *nameString = [NSMutableString stringWithUTF8String:name];
+          
+            // Provide workaround for the situation of a model having a "description" field. Description
+            // is already used by NSObjectProtocol so it cannot be a LBPersistedModel parameter.
+            // This provides an alternate mapping.
+            NSMutableString *key;
+            if ([nameString isEqualToString:@"desc"]) {
+              key = [NSMutableString stringWithString:@"description"];
+            } else {
+              key = [NSMutableString stringWithUTF8String:name];
+            }
+          
             id obj = dictionary[key];
             if (obj == nil) {
                 continue;
@@ -173,7 +185,11 @@
             }
           
             @try {
-                [model setValue:obj forKey:key];
+                if ([key isEqualToString:@"description"]) {
+                  [model setValue:obj forKey:@"desc"];
+                } else {
+                  [model setValue:obj forKey:key];
+                }
             }
             @catch (NSException *e) {
               // ignore and log any failure
